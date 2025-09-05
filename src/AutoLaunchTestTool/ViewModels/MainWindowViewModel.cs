@@ -13,6 +13,7 @@ using AutoLaunch;
 using Avalonia;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
+using DynamicData.Binding;
 using ReactiveUI;
 
 namespace AutoLaunchTestTool.ViewModels;
@@ -24,10 +25,10 @@ public class MainWindowViewModel : ViewModelBase
     /// </summary>
     public static readonly IValueConverter EnumToValues = new FuncValueConverter<object, object>(val => val is Type { IsEnum: true } type ? Enum.GetValuesAsUnderlyingType(type).Cast<object>().Select(v => Enum.ToObject(type, v)) : AvaloniaProperty.UnsetValue);
     /// <summary>
-    /// bool转颜色
+    /// bool转green/red
     /// </summary>
-    public static readonly IValueConverter BoolToColor = new FuncValueConverter<bool, IBrush>(val => val ? Brushes.Green : Brushes.Red);
-
+    public static readonly IValueConverter BoolToGr = new FuncValueConverter<bool, IBrush>(val => val ? Brushes.Green : Brushes.Red);
+    public static readonly IValueConverter BoolToRt = new FuncValueConverter<bool, IBrush>(val => val ? Brushes.Red : Brushes.Transparent);
 
     public string OSInfo => $"{Environment.OSVersion.Platform} - {OSHelpers.CurrentOS()} {Environment.OSVersion.Version} ({RuntimeInformation.OSArchitecture})";
     public string OSDescription => RuntimeInformation.OSDescription;
@@ -45,6 +46,7 @@ public class MainWindowViewModel : ViewModelBase
     public bool CanSetWorkScope { get; set => this.RaiseAndSetIfChanged(ref field, value); }
     public bool CanSetExtraConfig { get; set => this.RaiseAndSetIfChanged(ref field, value); }
     public bool CanSetIdentifiers { get; set => this.RaiseAndSetIfChanged(ref field, value); }
+    public bool ShouldRebuild { get; set => this.RaiseAndSetIfChanged(ref field, value); } = true;
 
     public string AppName { get; set => this.RaiseAndSetIfChanged(ref field, value); } = nameof(AutoLaunchTestTool);
     public string AppPath { get; set => this.RaiseAndSetIfChanged(ref field, value); } = Environment.ProcessPath!;
@@ -79,10 +81,13 @@ public class MainWindowViewModel : ViewModelBase
         this.WhenAnyValue(x => x.MacOSEngine).Subscribe(_ => { CanSetExtraConfig = (OperatingSystem.IsMacOS() && MacOSEngine is MacOSEngine.LaunchAgent) || (OperatingSystem.IsLinux() && LinuxEngine is LinuxEngine.Freedesktop); });
         // can set Identifiers
         this.WhenAnyValue(x => x.MacOSEngine).Subscribe(_ => { CanSetIdentifiers = OperatingSystem.IsMacOS() && MacOSEngine is MacOSEngine.LaunchAgent; });
+        // should rebuild
+        this.WhenAnyPropertyChanged(nameof(AppName), nameof(AppPath), nameof(Args), nameof(WorkScope), nameof(WindowsEngine), nameof(LinuxEngine), nameof(MacOSEngine), nameof(Identifiers), nameof(ExtraConfig)).Subscribe(_ => { ShouldRebuild = true; });
     }
 
     private async Task Build()
     {
+        ShouldRebuild = false;
         Launcher = new AutoLaunchBuilder()
             .SetAppName(AppName)
             .SetAppPath(AppPath)
