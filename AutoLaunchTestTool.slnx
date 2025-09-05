@@ -1,0 +1,7 @@
+﻿<Solution>
+    <Folder Name="/files/">
+        <File Path="README.md"/>
+    </Folder>
+    <Project Path="src\AutoLaunchTestTool\AutoLaunchTestTool.csproj" Type="Classic C#"/>
+    <Project Path="src\AutoLaunch\src\AutoLaunch\AutoLaunch.csproj" Type="Classic C#"/>
+</Solution>

@@ -1,0 +1,192 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:AutoLaunchTestTool.ViewModels"
+        xmlns:al="using:AutoLaunch"
+        xmlns:alto="using:AutoLaunchTestTool"
+        x:Class="AutoLaunchTestTool.Views.MainWindow" x:DataType="vm:MainWindowViewModel"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="300"
+        Width="500" Height="800" MinWidth="350" MinHeight="200"
+        Icon="/Assets/avalonia-logo.ico" Title="AutoLaunchTestTool"
+        WindowStartupLocation="CenterScreen">
+
+    <Design.DesignStyle>
+        <Style Selector="Window">
+            <Setter Property="RequestedThemeVariant" Value="Dark" />
+        </Style>
+    </Design.DesignStyle>
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <Window.Styles>
+        <Style Selector="Border.group">
+            <Setter Property="BorderBrush" Value="Gray" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="5" />
+            <Setter Property="Padding" Value="10" />
+
+            <Style Selector="^ TextBlock.title">
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="Margin" Value="0,0,0,10" />
+            </Style>
+        </Style>
+        <Style Selector="Button.action">
+            <Setter Property="Padding" Value="20,5" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+        </Style>
+    </Window.Styles>
+
+    <ScrollViewer>
+        <StackPanel Margin="20" Spacing="15">
+            <!-- title -->
+            <TextBlock Text="AutoLaunch Test Tool" FontSize="24" FontWeight="24" HorizontalAlignment="Center" Margin="0,0,0,0" />
+
+            <!-- info -->
+            <Border Classes="group">
+                <StackPanel>
+                    <TextBlock Classes="title" Text="信息" />
+
+                    <ScrollViewer MaxHeight="60" VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <TextBlock>
+                                <Run Text="启动时间: " />
+                                <Run Text="{x:Static alto:App.RunTime}" />
+                            </TextBlock>
+                            <TextBlock>
+                                <Run Text="启动参数: " />
+                                <Run Text="{x:Static alto:App.Args}" />
+                            </TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Margin="0,0,10,0">
+                                    <Run Text="是否管理员: " />
+                                    <Run Text="{Binding IsAdmin}" FontWeight="Bold" />
+                                </TextBlock>
+                                <Button Content="使用管理员重启" IsEnabled="{Binding !IsAdmin}" Command="{Binding RestartAsAdminCmd}" Background="CadetBlue" Padding="8,0" />
+                            </StackPanel>
+                            <TextBlock VerticalAlignment="Center" ToolTip.Tip="{Binding OSDescription}">
+                                <Run Text="系统: " />
+                                <Run Text="{Binding OSInfo}" />
+                            </TextBlock>
+                            <TextBlock>
+                                <Run Text="框架信息: " />
+                                <Run Text="{Binding FrameworkDescription}" />
+                            </TextBlock>
+                        </StackPanel>
+                    </ScrollViewer>
+                </StackPanel>
+            </Border>
+
+            <!-- base config -->
+            <Border Classes="group">
+                <StackPanel Spacing="10">
+                    <TextBlock Classes="title" Text="基础配置" />
+
+                    <Grid ColumnDefinitions="120,*">
+                        <TextBlock Text="应用名称:" VerticalAlignment="Center" />
+                        <TextBox Grid.Column="1" Text="{Binding AppName}" />
+                    </Grid>
+                    <Grid ColumnDefinitions="120,*">
+                        <TextBlock Text="应用路径:" VerticalAlignment="Center" />
+                        <TextBox Grid.Column="1" Text="{Binding AppPath}" />
+                    </Grid>
+                    <Grid ColumnDefinitions="120,*">
+                        <TextBlock Text="参数:" VerticalAlignment="Center" />
+                        <TextBox Grid.Column="1" Text="{Binding Args}" Watermark="用空格分割多个" />
+                    </Grid>
+                    <Grid ColumnDefinitions="120,*" IsEnabled="{Binding CanSetWorkScope}">
+                        <TextBlock Text="工作范围:" VerticalAlignment="Center" />
+                        <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" ItemsSource="{Binding Source={x:Type al:WorkScope},Converter={x:Static vm:MainWindowViewModel.EnumToValues}}" SelectedItem="{Binding WorkScope}" />
+                    </Grid>
+                    <Grid ColumnDefinitions="120,*" IsEnabled="{Binding CanSetExtraConfig}">
+                        <TextBlock Text="额外配置" VerticalAlignment="Center" />
+                        <TextBox Grid.Column="1" Text="{Binding ExtraConfig}" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- windows config -->
+            <Border Classes="group" IsVisible="{Binding IsWindows}">
+                <StackPanel Spacing="10">
+                    <TextBlock Classes="title" Text="Windows 配置" />
+
+                    <Grid ColumnDefinitions="120,*">
+                        <TextBlock Text="启动引擎:" VerticalAlignment="Center" />
+                        <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" ItemsSource="{Binding Source={x:Type al:WindowsEngine},Converter={x:Static vm:MainWindowViewModel.EnumToValues}}" SelectedItem="{Binding WindowsEngine}" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- linux config -->
+            <Border Classes="group" IsVisible="{Binding IsLinux}">
+                <StackPanel Spacing="10">
+                    <TextBlock Classes="title" Text="Windows 配置" />
+
+                    <Grid ColumnDefinitions="120,*">
+                        <TextBlock Text="启动引擎:" VerticalAlignment="Center" />
+                        <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" ItemsSource="{Binding Source={x:Type al:LinuxEngine},Converter={x:Static vm:MainWindowViewModel.EnumToValues}}" SelectedItem="{Binding LinuxEngine}" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- macos config -->
+            <Border Classes="group" IsVisible="{Binding IsMacOS}">
+                <StackPanel Spacing="10">
+                    <TextBlock Classes="title" Text="MacOS 配置" />
+
+                    <Grid ColumnDefinitions="120,*">
+                        <TextBlock Text="启动引擎:" VerticalAlignment="Center" />
+                        <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" ItemsSource="{Binding Source={x:Type al:MacOSEngine},Converter={x:Static vm:MainWindowViewModel.EnumToValues}}" SelectedItem="{Binding MacOSEngine}" />
+                    </Grid>
+                    <Grid ColumnDefinitions="120,*" IsEnabled="{Binding CanSetIdentifiers}">
+                        <TextBlock Text="Bundle ID:" VerticalAlignment="Center" />
+                        <TextBox Grid.Column="1" Text="{Binding Identifiers}" Watermark="用逗号分割多个" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- actions -->
+            <Border Classes="group">
+                <StackPanel Spacing="10">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Classes="title" Text="操作" Margin="0,0,10,0" />
+                        <TextBlock>
+                            <Run Text="当前状态:   " />
+                            <Run Text="{Binding IsEnable}" FontWeight="Bold" Foreground="{Binding IsEnable,Converter={x:Static vm:MainWindowViewModel.BoolToColor}}" />
+                        </TextBlock>
+                    </StackPanel>
+
+                    <UniformGrid Columns="4">
+                        <Button Classes="action" Content="构建" Command="{Binding BuildCmd}" Background="CornflowerBlue" />
+                        <Button Classes="action" Content="启动" Command="{Binding  EnableCmd}" Background="LightGreen" />
+                        <Button Classes="action" Content="禁用" Command="{Binding DisableCmd}" Background="LightCoral" />
+                        <Button Classes="action" Content="刷新" Command="{Binding RefreshCmd}" Background="Teal" />
+                    </UniformGrid>
+                </StackPanel>
+            </Border>
+
+            <!-- message -->
+            <Border Classes="group">
+                <StackPanel Spacing="10">
+                    <TextBlock Classes="title" Text="消息" />
+
+                    <TextBox Text="{Binding Message}" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" Height="150" />
+                </StackPanel>
+            </Border>
+
+            <!-- instructions -->
+            <Expander VerticalAlignment="Top" Header="说明" HorizontalAlignment="Stretch">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="1. 本工具用于测试 AutoLaunch 库的功能。" TextWrapping="Wrap" />
+                    <TextBlock Text="2. 请确保应用名称和路径正确，否则可能无法正常工作。" TextWrapping="Wrap" />
+                    <TextBlock Text="3. 不同操作系统和引擎可能有不同的限制和要求，请参考相关文档。" TextWrapping="Wrap" />
+                    <TextBlock Text="4. 额外配置字段用于传递特定引擎的自定义参数，格式应符合相应引擎的规范。" TextWrapping="Wrap" />
+                    <TextBlock Text="5. 点击“刷新”按钮可以检查当前自启动状态。" TextWrapping="Wrap" />
+                </StackPanel>
+            </Expander>
+        </StackPanel>
+    </ScrollViewer>
+
+</Window>

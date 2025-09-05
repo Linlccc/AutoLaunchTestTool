@@ -1,0 +1,3 @@
+[submodule "src/AutoLaunch"]
+	path = src/AutoLaunch
+	url = https://github.com/Linlccc/AutoLaunch.git
