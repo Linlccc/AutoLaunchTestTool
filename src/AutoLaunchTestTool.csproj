@@ -25,7 +25,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Folder Include="Models\"/>
         <AvaloniaResource Include="Assets\**"/>
     </ItemGroup>
 
@@ -44,5 +43,6 @@
 
     <ItemGroup>
         <PackageReference Include="AutoLaunch" Version="1.0.0"/>
+<!--        <ProjectReference Include="..\AutoLaunch\src\AutoLaunch.csproj" />-->
     </ItemGroup>
 </Project>
