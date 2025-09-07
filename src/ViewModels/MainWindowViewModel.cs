@@ -28,7 +28,7 @@ public class MainWindowViewModel : ViewModelBase
     /// bool转green/red
     /// </summary>
     public static readonly IValueConverter BoolToGr = new FuncValueConverter<bool, IBrush>(val => val ? Brushes.Green : Brushes.Red);
-    public static readonly IValueConverter BoolToRt = new FuncValueConverter<bool, IBrush>(val => val ? Brushes.Red : Brushes.Transparent);
+    public static readonly IValueConverter BoolToOt = new FuncValueConverter<bool, IBrush>(val => val ? Brushes.DarkOrange : Brushes.Transparent);
 
     public string OSInfo => $"{Environment.OSVersion.Platform} - {OSHelpers.CurrentOS()} {Environment.OSVersion.Version} ({RuntimeInformation.OSArchitecture})";
     public string OSDescription => RuntimeInformation.OSDescription;

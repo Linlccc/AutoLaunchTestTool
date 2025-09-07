@@ -159,7 +159,12 @@
                     </StackPanel>
 
                     <UniformGrid Columns="4">
-                        <Button Classes="action" Content="构建" Command="{Binding BuildCmd}" Background="CornflowerBlue" BorderBrush="{Binding ShouldRebuild,Converter={x:Static vm:MainWindowViewModel.BoolToRt}}" BorderThickness="1" />
+                        <Button Classes="action" Command="{Binding BuildCmd}" Background="CornflowerBlue">
+                            <TextBlock>
+                                <Run Text="●" Foreground="{Binding ShouldRebuild,Converter={x:Static vm:MainWindowViewModel.BoolToOt}}" />
+                                <Run Text="构建  " />
+                            </TextBlock>
+                        </Button>
                         <Button Classes="action" Content="启动" Command="{Binding  EnableCmd}" Background="LightGreen" />
                         <Button Classes="action" Content="禁用" Command="{Binding DisableCmd}" Background="LightCoral" />
                         <Button Classes="action" Content="刷新" Command="{Binding RefreshCmd}" Background="Teal" />
