@@ -44,6 +44,5 @@
 
     <ItemGroup>
         <PackageReference Include="AutoLaunch" Version="1.0.0"/>
-        <!--        <ProjectReference Include="..\AutoLaunch\src\AutoLaunch\AutoLaunch.csproj"/>-->
     </ItemGroup>
 </Project>
