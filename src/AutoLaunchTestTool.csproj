@@ -42,7 +42,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoLaunch" Version="1.0.0"/>
+        <PackageReference Include="AutoLaunch" Version="1.0.1" />
 <!--        <ProjectReference Include="..\AutoLaunch\src\AutoLaunch.csproj" />-->
     </ItemGroup>
 </Project>

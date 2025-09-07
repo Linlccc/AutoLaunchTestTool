@@ -116,7 +116,7 @@ public class MainWindowViewModel : ViewModelBase
     private async Task RefreshAsync()
     {
         if (Launcher is null) return;
-        (bool success, bool enabled) = await Launcher.TryIsEnabledAsync();
+        (bool success, bool enabled) = await Launcher.TryGetStatusAsync();
         IsEnable = enabled;
         if (success) Message = $"{DateTime.Now:hh:mm:ss.f}: \t{enabled}";
         else ShowError("Refresh");
