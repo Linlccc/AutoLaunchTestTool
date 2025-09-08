@@ -95,7 +95,7 @@
                     <!-- linux config -->
                     <Border Grid.Row="1" Classes="group" IsVisible="{Binding IsLinux}">
                         <StackPanel Spacing="10">
-                            <TextBlock Classes="title" Text="Windows 配置" />
+                            <TextBlock Classes="title" Text="Linux 配置" />
 
                             <Grid ColumnDefinitions="120,*">
                                 <TextBlock Text="启动引擎:" VerticalAlignment="Center" />
@@ -182,7 +182,23 @@
                 <Grid RowDefinitions="Auto,*" RowSpacing="10">
                     <TextBlock Classes="title" Text="日志" />
 
-                    <TextBox Grid.Row="1" Text="{Binding Message}" IsReadOnly="True" />
+                    <ScrollViewer Grid.Row="1" x:Name="LogScrollViewer">
+                        <ItemsControl ItemsSource="{Binding Logs}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Expander IsExpanded="False" Margin="0,1" HorizontalAlignment="Stretch" Padding="3" MinHeight="32">
+                                        <Expander.Header>
+                                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                                <TextBlock Text="●" FontSize="12" Foreground="{Binding Status, Converter={x:Static vm:MainWindowViewModel.LogStatusToBrush}}" />
+                                                <TextBlock Grid.Column="1" Text="{Binding DisplayText}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
+                                            </Grid>
+                                        </Expander.Header>
+                                        <TextBox Text="{Binding Message}" IsReadOnly="True" />
+                                    </Expander>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
                 </Grid>
             </Border>
 

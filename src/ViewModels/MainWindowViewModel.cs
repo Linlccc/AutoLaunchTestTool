@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using AutoLaunch;
 using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
 using DynamicData.Binding;
@@ -28,7 +29,15 @@ public class MainWindowViewModel : ViewModelBase
     /// bool转green/red
     /// </summary>
     public static readonly IValueConverter BoolToGr = new FuncValueConverter<bool, IBrush>(val => val ? Brushes.Green : Brushes.Red);
-    public static readonly IValueConverter BoolToOt = new FuncValueConverter<bool, IBrush>(val => val ? Brushes.DarkOrange : Brushes.Transparent);
+    /// <summary>
+    /// LogStatus转颜色
+    /// </summary>
+    public static readonly IValueConverter LogStatusToBrush = new FuncValueConverter<LogStatus, IBrush>(status => status switch
+    {
+        LogStatus.Success => Brushes.Green,
+        LogStatus.Failure => Brushes.Red,
+        _ => Brushes.Gray
+    });
 
     public string OSInfo => $"{Environment.OSVersion.Platform} - {OSHelpers.CurrentOS()} {Environment.OSVersion.Version} ({RuntimeInformation.OSArchitecture})";
     public string OSDescription => RuntimeInformation.OSDescription;
@@ -41,7 +50,7 @@ public class MainWindowViewModel : ViewModelBase
 
 
     private SafeAutoLauncher? Launcher { get; set => this.RaiseAndSetIfChanged(ref field, value); }
-    public string Message { get; set => this.RaiseAndSetIfChanged(ref field, value); }
+    public AvaloniaList<LogItem> Logs { get; } = [];
     public bool IsEnable { get; set => this.RaiseAndSetIfChanged(ref field, value); }
     public bool CanSetWorkScope { get; set => this.RaiseAndSetIfChanged(ref field, value); }
     public bool CanSetExtraConfig { get; set => this.RaiseAndSetIfChanged(ref field, value); }
@@ -66,7 +75,7 @@ public class MainWindowViewModel : ViewModelBase
 
     public MainWindowViewModel()
     {
-        Message = $"launch info: {string.Join(" ", Environment.GetCommandLineArgs())}";
+        AddLog(LogStatus.Normal, "Launch info", string.Join(" ", Environment.GetCommandLineArgs()));
         IObservable<bool> canExec = this.WhenAnyValue(x => x.Launcher).Select(al => al is not null);
 
         BuildCmd = ReactiveCommand.CreateFromTask(Build);
@@ -99,29 +108,37 @@ public class MainWindowViewModel : ViewModelBase
             .SetIdentifiers(Identifiers.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()))
             .SetExtraConfig(ExtraConfig)
             .BuildSafe();
+        AddLog(LogStatus.Normal, "Build");
         await RefreshAsync();
     }
     private async Task EnableAsync()
     {
         if (Launcher is null) return;
-        if (await Launcher.TryEnableAsync()) await RefreshAsync();
-        else ShowError("Enable");
+        if (!await Launcher.TryEnableAsync()) AddLog(LogStatus.Failure, "Enable", Launcher?.TakeLastException()?.ToString());
+        else
+        {
+            AddLog(LogStatus.Success, "Enable");
+            await RefreshAsync();
+        }
     }
     private async Task DisableAsync()
     {
         if (Launcher is null) return;
-        if (await Launcher.TryDisableAsync()) await RefreshAsync();
-        else ShowError("Disable");
+        if (!await Launcher.TryDisableAsync()) AddLog(LogStatus.Failure, "Disable", Launcher?.TakeLastException()?.ToString());
+        else
+        {
+            AddLog(LogStatus.Success, "Disable");
+            await RefreshAsync();
+        }
     }
     private async Task RefreshAsync()
     {
         if (Launcher is null) return;
         (bool success, bool enabled) = await Launcher.TryGetStatusAsync();
         IsEnable = enabled;
-        if (success) Message = $"{DateTime.Now:hh:mm:ss.f}: \t{enabled}";
-        else ShowError("Refresh");
+        if (success) AddLog(LogStatus.Success, "Refresh", $"IsEnable: {enabled}");
+        else AddLog(LogStatus.Failure, "Refresh", Launcher?.TakeLastException()?.ToString());
     }
-    private void ShowError(string action) => Message = $"{action} failed:{Environment.NewLine}{Launcher?.TakeLastException()}";
 
     private void RestartAsAdmin()
     {
@@ -151,7 +168,7 @@ public class MainWindowViewModel : ViewModelBase
             {
                 if (OSHelpers.IsRunningInLaunchd())
                 {
-                    Message = "Cannot restart as admin when running in LaunchAgent, please run the app manually.";
+                    AddLog(LogStatus.Failure, "Cannot restart as admin when running in LaunchAgent, please run the app manually.");
                     return;
                 }
                 string script = $"""do shell script "{fileName} {string.Join(" ", args)}" with administrator privileges""";
@@ -165,9 +182,35 @@ public class MainWindowViewModel : ViewModelBase
         }
         catch (Exception e)
         {
-            Message = $"Restart as admin failed: {e}";
+            AddLog(LogStatus.Failure, $"Restart as admin failed: {e}");
         }
     }
+
+    private void AddLog(LogStatus status, string title, string? message = null)
+    {
+        Logs.Add(new LogItem(status, title, message));
+        if (Logs.Count > 100) Logs.RemoveAt(0);
+    }
+}
+
+public enum LogStatus
+{
+    Normal,
+    Success,
+    Failure
+}
+
+public class LogItem(LogStatus status, string title, string? message)
+{
+    public DateTime DateTime { get; set; } = DateTime.Now;
+
+    public LogStatus Status { get; set; } = status;
+
+    public string Title { get; set; } = title;
+
+    public string? Message { get; set; } = message;
+
+    public string DisplayText => $"[{DateTime:HH:mm:ss}] {Title}";
 }
 
 public static partial class OSHelpers
