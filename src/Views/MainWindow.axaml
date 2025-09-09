@@ -30,7 +30,10 @@
             <Style Selector="^ TextBlock.title">
                 <Setter Property="FontWeight" Value="Bold" />
                 <Setter Property="FontSize" Value="16" />
-                <Setter Property="Margin" Value="0,0,0,10" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="Margin" Value="0,-20,0,0" />
+                <Setter Property="Padding" Value="10,0" />
+                <Setter Property="Background" Value="{DynamicResource SystemRegionBrush}" />
             </Style>
         </Style>
         <Style Selector="Button.action">
@@ -125,13 +128,11 @@
                         <!-- actions -->
                         <Border Grid.Row="3" Classes="group">
                             <StackPanel Spacing="10">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Classes="title" Text="操作" Margin="0,0,10,0" />
-                                    <TextBlock>
-                                        <Run Text="当前状态:   " />
-                                        <Run Text="{Binding IsEnable}" FontWeight="Bold" Foreground="{Binding IsEnable,Converter={x:Static vm:MainWindowViewModel.BoolToGr}}" />
-                                    </TextBlock>
-                                </StackPanel>
+                                <TextBlock Classes="title" Text="操作" />
+                                <TextBlock>
+                                    <Run Text="当前状态:   " />
+                                    <Run Text="{Binding IsEnable}" FontWeight="Bold" Foreground="{Binding IsEnable,Converter={x:Static vm:MainWindowViewModel.BoolToGr}}" />
+                                </TextBlock>
 
                                 <UniformGrid Columns="3">
                                     <Button Classes="action" Content="启动" Command="{Binding  EnableCmd}" Background="LightGreen" />
