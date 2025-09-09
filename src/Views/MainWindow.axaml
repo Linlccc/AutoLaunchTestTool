@@ -83,7 +83,7 @@
                         </Border>
 
                         <!-- windows config -->
-                        <Border Grid.Row="1" Classes="group" IsVisible="{Binding IsWindows}">
+                        <Border Grid.Row="1" Classes="group" IsVisible="{x:Static alto:App.IsWindows}">
                             <StackPanel Spacing="10">
                                 <TextBlock Classes="title" Text="Windows 配置" />
 
@@ -94,7 +94,7 @@
                             </StackPanel>
                         </Border>
                         <!-- linux config -->
-                        <Border Grid.Row="1" Classes="group" IsVisible="{Binding IsLinux}">
+                        <Border Grid.Row="1" Classes="group" IsVisible="{x:Static alto:App.IsLinux}">
                             <StackPanel Spacing="10">
                                 <TextBlock Classes="title" Text="Linux 配置" />
 
@@ -105,7 +105,7 @@
                             </StackPanel>
                         </Border>
                         <!-- macos config -->
-                        <Border Grid.Row="1" Classes="group" IsVisible="{Binding IsMacOS}">
+                        <Border Grid.Row="1" Classes="group" IsVisible="{x:Static alto:App.IsMacOS}">
                             <StackPanel Spacing="10">
                                 <TextBlock Classes="title" Text="macOS 配置" />
 
@@ -162,17 +162,17 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Margin="0,0,10,0">
                                     <Run Text="是否管理员: " />
-                                    <Run Text="{Binding IsAdmin}" FontWeight="Bold" />
+                                    <Run Text="{x:Static alto:App.IsAdminText}" FontWeight="Bold" />
                                 </TextBlock>
-                                <Button Content="使用管理员重启" IsEnabled="{Binding !IsAdmin}" Command="{Binding RestartAsAdminCmd}" Background="CadetBlue" Padding="8,0" />
+                                <Button Content="使用管理员重启" IsEnabled="{x:Static alto:App.IsNotAdmin}" Command="{Binding RestartAsAdminCmd}" Background="CadetBlue" Padding="8,0" />
                             </StackPanel>
-                            <TextBlock VerticalAlignment="Center" ToolTip.Tip="{Binding OSDescription}">
+                            <TextBlock VerticalAlignment="Center" ToolTip.Tip="{x:Static alto:App.OSDescription}">
                                 <Run Text="系统: " />
-                                <Run Text="{Binding OSInfo}" />
+                                <Run Text="{x:Static alto:App.OSInfo}" />
                             </TextBlock>
                             <TextBlock>
                                 <Run Text="框架信息: " />
-                                <Run Text="{Binding FrameworkDescription}" />
+                                <Run Text="{x:Static alto:App.FrameworkDescription}" />
                             </TextBlock>
                         </StackPanel>
                     </StackPanel>

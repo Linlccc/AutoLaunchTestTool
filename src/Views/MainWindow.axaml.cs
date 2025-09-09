@@ -14,6 +14,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         WindowRoot.LayoutTransform = new ScaleTransform(.8, .8);
 
+        // Auto-scroll log to bottom
         Loaded += OnLoaded;
     }
 
